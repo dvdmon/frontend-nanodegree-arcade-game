@@ -6,15 +6,14 @@ var GAME_CANVAS = 505;
  // the three rows for randomly reassigning a row for a given
  // bug once they go off the right side of the screen - see bellow
  var BUGROWS = new Array( 55,  140, 225);
- var STARS = new Array();
+var allStars = new Array();
+
  var Star = function() {
-    this.x = 10;
-    this.y = 10
     this.sprite = 'images/Star.png';
+    this.y = -5;
 };
 Star.prototype.render = function() {
-    this.x = (STARS.length +1) * 50;
-    ctx.drawImage(Resources.get(this.sprite), 50, 50);
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Enemies our player must avoid
@@ -153,15 +152,17 @@ var Player = function() {
             break;
           case  'up':
             var currentUpY = this.y;
-            var wonStar = new Star();
-            ctx.drawImage(Resources.get('images/Star.png'), 50, 50);
             if(currentUpY > (WATER_YCOORDS))
             {
                 this.y -= 40;
             } else
             {
+                console.log('initial: ' + allStars.length);
+                var newStar = new Star();
+                newStar.x = allStars.length * 70;
+                allStars.push(newStar);
 
-               wonStar.render();
+                console.log('now: ' + allStars.length);
                this.reset();
             }
 
