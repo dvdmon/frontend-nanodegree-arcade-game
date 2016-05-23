@@ -1,17 +1,33 @@
 
 // Set up Canvas width for calculating various events
-var GAME_CANVAS = 505;
+var GAME_CANVAS_WIDTH = 505;
 
  // Create an array to hold the y coordinates for each of
  // the three rows for randomly reassigning a row for a given
  // bug once they go off the right side of the screen - see bellow
- var BUGROWS = new Array( 55,  140, 225);
+var BUGROWS = [55,140,225];
+
+// Set up various x and y coordinates that define boundaries that
+// will be used to check where the player can go and will allow for
+// the awarding of a star - if the water is reached:
+var WATER_YCOORDS = 100;
+var SAND_YCOORDS =  380;
+var PLAYER_LEFT_BOUNDARY = 45;
+var PLAYER_RIGHT_BOUNDARY = 375;
+
+
+// create array to hold stars
 var allStars = new Array();
 
- var Star = function() {
+//Constructor for new star objects
+var Star = function() {
+    // all star objects will have the same sprite image (for now)
+    // and exist on the same horizontal line on top of the water.
     this.sprite = 'images/Star.png';
     this.y = -5;
 };
+
+//Set up prototype method for rendering new stars
 Star.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
@@ -42,22 +58,12 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 
-
-
-    // If the bug goes off the right side of the screen
-    // this code will run only once to "reset" the bug and set
-    // up a constant (new) speed, and a (potentially) new row
-    if (this.x >= 505)
+    if (this.x >= GAME_CANVAS_WIDTH)
     {
-        // Set the bug back to the left side of the screen
-        this.x = 0;
-
-        // Randomly choose a row to put the bug on
-        this.y = BUGROWS[getRandomInt(0,3)];
-
-        // Randomly set a speed (within a range) for the bug
-        this.speed = getRandomInt(60, 300);
-
+        // If the bug goes off the right side of the screen
+        // this code will run only once to "reset" the bug and set
+        // up a constant (new) speed, and a (potentially) new row
+        this.reset();
     }
     else
     {
@@ -68,31 +74,36 @@ Enemy.prototype.update = function(dt) {
 
     // Collision detection:
     // we need to get the x and y coordinates for both the enemy and
-    //the player:
+    // the player these variables are for making what we are examining
+    // and compairing easier to understand:
     var EnemyLeftEdge = this.x;
     var EnemyRightEdge = EnemyLeftEdge + (this.width/2);
     var PlayerLeftEdge = player.x;
     var PlayerRightEdge = PlayerLeftEdge + (player.width/2);
-
     var EnemyTopEdge = this.y
     var EnemyBottomEdge = EnemyTopEdge + (this.height/2);
     var PlayerTopEdge = player.y;
     var PlayerBottomEdge = PlayerTopEdge + (player.height/2);
 
-
-    //if (PlayerleftEdge <= EnemyrightEdge && PlayerrightEdge >= EnemyleftEdge && PlayertopEdge >= EnemybottomEdge && PlayerbottomEdge <= EnemytopEdge)
-    if (
-//        PlayerTopEdge > EnemyTopEdge && PlayerTopEdge < EnemyBottomEdge && PlayerBottomEdge > EnemyTopEdge && PlayerBottomEdge < EnemyBottomEdge)
-//        &&
-//        PlayerLeftEdge < EnemyRightEdge && PlayerLeftEdge > EnemyLeftEdge && PlayerRightEdge > EnemyLeftEdge && PlayerRightEdge < EnemyRightEdge
-          EnemyRightEdge >= PlayerLeftEdge && EnemyLeftEdge <= PlayerRightEdge && EnemyBottomEdge >= PlayerTopEdge && EnemyTopEdge <= PlayerBottomEdge
-
-        )
-    {
+    // use the bounding box method to determine if there is a
+    // collision between this enemy and the player:
+    if (EnemyRightEdge >= PlayerLeftEdge && EnemyLeftEdge <= PlayerRightEdge && EnemyBottomEdge >= PlayerTopEdge && EnemyTopEdge <= PlayerBottomEdge) {
+        // reset the player to the starting position if they've hit one of the bugs:
         player.reset();
-        }
+    }
+};
 
+// reset the bug once it's progressed to the end (right side)
+// of the screen:
+Enemy.prototype.reset = function() {
+    // Set the bug back to the left side of the screen
+    this.x = 0;
 
+   // Randomly choose a row to put the bug on
+   this.y = BUGROWS[getRandomInt(0,3)];
+
+   // Randomly set a speed (within a range) for the bug
+   this.speed = getRandomInt(60, 300);
 };
 
 // Draw the enemy on the screen, required method for game
@@ -110,83 +121,63 @@ var Player = function() {
     this.sprite = 'images/char-boy.png';
     this.width = 101;
     this.height = 171;
-    this.startX = (GAME_CANVAS / 2) - (this.width / 2);
+    this.startX = (GAME_CANVAS_WIDTH/ 2) - (this.width / 2);
     this.startY = 370;
 
-    var WATER_YCOORDS = 100;
-    var SAND_YCOORDS =  380;
-    var PLAYER_LEFT_BOUNDARY = 45;
-    var PLAYER_RIGHT_BOUNDARY = 375;
 
+    // Since there is only ever one player per game, there doesn't
+    // seem to be a need for the reset funtion to be created as a method
+    // on the prototype.  This method will simply bring the player back to
+    // the initial x/y coords based on the properties set up when
+    // instantiating the object:
     this.reset = function() {
         this.x = this.startX;
         this.y = this.startY;
     }
 
-
+    // again, no need for a prototype method, the update methond here will
     this.update = function() {
         if (this.x < 40)
         {
-            this.x = (GAME_CANVAS.width / 2) - (this.width / 2);
+            this.x = (GAME_CANVAS_WIDTH / 2) - (this.width / 2);
             this.y = 380;
         }
-        //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-
     };
+
     this.render = function() {
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
     };
+
     this.handleInput = function(keyCode) {
         switch (keyCode) {
           case 'left':
-            var currentLeftX = this.x;
-
-            if(currentLeftX > (PLAYER_LEFT_BOUNDARY))
-            {
+            if(this.x > PLAYER_LEFT_BOUNDARY) {
                 this.x -= 40;
-            } else
-            {
+            } else {
                 this.x = currentLeftX;
             }
-
             break;
           case  'up':
-            var currentUpY = this.y;
-            if(currentUpY > (WATER_YCOORDS))
-            {
+            if (this.y > WATER_YCOORDS) {
                 this.y -= 40;
-            } else
-            {
-                console.log('initial: ' + allStars.length);
+            } else {
                 var newStar = new Star();
                 newStar.x = allStars.length * 70;
                 allStars.push(newStar);
-
-                console.log('now: ' + allStars.length);
-               this.reset();
+                this.reset();
             }
-
             break;
           case 'right':
-            var currentRightX = this.x ;
-
-            if(currentRightX < (PLAYER_RIGHT_BOUNDARY))
-            {
+            if (this.x < PLAYER_RIGHT_BOUNDARY) {
                 this.x += 40;
-            } else
-            {
+            } else {
                 this.x = currentRightX;
             }
             break;
-
           case 'down':
-            var currentDownY = this.y ;
-
-            if(currentDownY < (SAND_YCOORDS))
-            {
+            if (this.y < SAND_YCOORDS) {
                 this.y += 40;
-            } else
-            {
+            } else {
                 this.y = currentDownY;
             }
             break;
