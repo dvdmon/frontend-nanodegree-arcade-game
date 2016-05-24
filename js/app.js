@@ -17,7 +17,7 @@ var PLAYER_RIGHT_BOUNDARY = 375;
 
 
 // create array to hold stars
-var allStars = new Array();
+var allStars = [];
 
 //Constructor for new star objects
 var Star = function() {
@@ -69,7 +69,7 @@ Enemy.prototype.update = function(dt) {
     {
         // Move the bug by increasing its x coordinate by it's
         // randomly generated speed property multiplied by dt param
-        this.x += (this.speed * dt)
+        this.x += (this.speed * dt);
     }
 
     // Collision detection:
@@ -77,13 +77,13 @@ Enemy.prototype.update = function(dt) {
     // the player these variables are for making what we are examining
     // and compairing easier to understand:
     var enemyLeftEdge = this.x;
-    var enemyRightEdge = EnemyLeftEdge + (this.width/2);
+    var enemyRightEdge = enemyLeftEdge + (this.width/2);
     var playerLeftEdge = player.x;
-    var playerRightEdge = PlayerLeftEdge + (player.width/2);
-    var enemyTopEdge = this.y
-    var enemyBottomEdge = EnemyTopEdge + (this.height/2);
+    var playerRightEdge = playerLeftEdge + (player.width/2);
+    var enemyTopEdge = this.y;
+    var enemyBottomEdge = enemyTopEdge + (this.height/2);
     var playerTopEdge = player.y;
-    var playerBottomEdge = PlayerTopEdge + (player.height/2);
+    var playerBottomEdge = playerTopEdge + (player.height/2);
 
     // use the bounding box method to determine if there is a
     // collision between this enemy and the player:
@@ -133,7 +133,7 @@ var Player = function() {
     this.reset = function() {
         this.x = this.startX;
         this.y = this.startY;
-    }
+    };
 
     // again, no need for a prototype method, the update methond here will
     this.update = function() {
@@ -153,8 +153,6 @@ var Player = function() {
           case 'left':
             if(this.x > PLAYER_LEFT_BOUNDARY) {
                 this.x -= 40;
-            } else {
-                this.x = currentLeftX;
             }
             break;
           case  'up':
@@ -170,15 +168,11 @@ var Player = function() {
           case 'right':
             if (this.x < PLAYER_RIGHT_BOUNDARY) {
                 this.x += 40;
-            } else {
-                this.x = currentRightX;
             }
             break;
           case 'down':
             if (this.y < SAND_YCOORDS) {
                 this.y += 40;
-            } else {
-                this.y = currentDownY;
             }
             break;
         }
