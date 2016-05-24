@@ -2,9 +2,9 @@
 // Set up Canvas width for calculating various events
 var GAME_CANVAS_WIDTH = 505;
 
- // Create an array to hold the y coordinates for each of
- // the three rows for randomly reassigning a row for a given
- // bug once they go off the right side of the screen - see bellow
+// Create an array to hold the y coordinates for each of
+// the three rows for randomly reassigning a row for a given
+// bug once they go off the right side of the screen - see bellow
 var BUGROWS = [55,140,225];
 
 // Set up various x and y coordinates that define boundaries that
@@ -76,18 +76,18 @@ Enemy.prototype.update = function(dt) {
     // we need to get the x and y coordinates for both the enemy and
     // the player these variables are for making what we are examining
     // and compairing easier to understand:
-    var EnemyLeftEdge = this.x;
-    var EnemyRightEdge = EnemyLeftEdge + (this.width/2);
-    var PlayerLeftEdge = player.x;
-    var PlayerRightEdge = PlayerLeftEdge + (player.width/2);
-    var EnemyTopEdge = this.y
-    var EnemyBottomEdge = EnemyTopEdge + (this.height/2);
-    var PlayerTopEdge = player.y;
-    var PlayerBottomEdge = PlayerTopEdge + (player.height/2);
+    var enemyLeftEdge = this.x;
+    var enemyRightEdge = EnemyLeftEdge + (this.width/2);
+    var playerLeftEdge = player.x;
+    var playerRightEdge = PlayerLeftEdge + (player.width/2);
+    var enemyTopEdge = this.y
+    var enemyBottomEdge = EnemyTopEdge + (this.height/2);
+    var playerTopEdge = player.y;
+    var playerBottomEdge = PlayerTopEdge + (player.height/2);
 
     // use the bounding box method to determine if there is a
     // collision between this enemy and the player:
-    if (EnemyRightEdge >= PlayerLeftEdge && EnemyLeftEdge <= PlayerRightEdge && EnemyBottomEdge >= PlayerTopEdge && EnemyTopEdge <= PlayerBottomEdge) {
+    if (enemyRightEdge >= playerLeftEdge && enemyLeftEdge <= playerRightEdge && enemyBottomEdge >= playerTopEdge && enemyTopEdge <= playerBottomEdge) {
         // reset the player to the starting position if they've hit one of the bugs:
         player.reset();
     }
@@ -188,8 +188,6 @@ var Player = function() {
 
 
 // Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-
 var topBug  = new Enemy();
 topBug.x = 0;
 topBug.y = BUGROWS[0];
@@ -199,13 +197,13 @@ middleBug.y = BUGROWS[1];
 var bottomBug = new Enemy();
 bottomBug.x = 0;
 bottomBug.y = BUGROWS[2];
-//var allEnemies = new Array(topBug, middleBug, bottomBug);
-var allEnemies = new Array(bottomBug, middleBug, topBug);
+
+// Place all enemy objects in an array called allEnemies
+var allEnemies = [bottomBug, middleBug, topBug];
+
 // Place the player object in a variable called player
 var player = new Player();
 player.reset();
-
-
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -220,6 +218,7 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
+// function to generate random whole numbers within a specific range.
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
